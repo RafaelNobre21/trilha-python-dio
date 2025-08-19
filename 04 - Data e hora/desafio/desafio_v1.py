@@ -27,14 +27,16 @@ class ContasIterador:
 
 
 class Cliente:
-    def __init__(self, endereco):
+    def __init__(self, endereco, limite_transacoes_diarias=10):
         self.endereco = endereco
         self.contas = []
         self.indice_conta = 0
-
+        self.limite_transacoes_diarias = limite_transacoes_diarias
     def realizar_transacao(self, conta, transacao):
-        # TODO: validar o número de transações e invalidar a operação se for necessário
-        # print("\n@@@ Você excedeu o número de transações permitidas para hoje! @@@")
+        total_hoje = sum(len(c.historico.transacoes_do_dia()) for c in self.contas)
+        if total_hoje >= self.limite_transacoes_diarias:
+            print("\n@@@ Você excedeu o número de transações permitidas para hoje! @@@")
+            return
         transacao.registrar(conta)
 
     def adicionar_conta(self, conta):
@@ -170,7 +172,13 @@ class Historico:
 
     # TODO: filtrar todas as transações realizadas no dia
     def transacoes_do_dia(self):
-        pass
+        hoje = datetime.now().date()
+        formato_data = "%d/%m/%Y %H:%M"
+        return [
+            transacao
+            for transacao in self._transacoes
+            if datetime.strptime(transacao["data"], formato_data).date() == hoje
+        ]
 
 
 class Transacao(ABC):
