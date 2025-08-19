@@ -263,8 +263,37 @@ def recuperar_conta_cliente(cliente):
         print("\n@@@ Cliente não possui conta! @@@")
         return
 
-    # FIXME: não permite cliente escolher a conta
-    return cliente.contas[0]
+    #Permitir que o client escolha a conta quando houver mais de uma
+    if len(cliente.contas) == 1:
+        return cliente.contas[0]
+
+    print("\nContas do cliente:")
+    for indice, conta in enumerate(cliente.contas, start=1):
+        print(
+            f"[{indice}] Agência: {conta.agencia}  Número: {conta.numero}  Saldo: R$ {conta.saldo:.2f}"
+        )
+
+    while True:
+        escolha = input(
+            "Escolha a conta pelo índice ou número (pressione Enter para cancelar): "
+        ).strip()
+
+        if escolha == "":
+            return
+
+        if escolha.isdigit():
+            numero = int(escolha)
+
+            # Seleção por índice
+            if 1 <= numero <= len(cliente.contas):
+                return cliente.contas[numero - 1]
+
+            # Seleção por número da conta
+            for conta in cliente.contas:
+                if conta.numero == numero:
+                    return conta
+
+        print("\n@@@ Entrada inválida. Tente novamente. @@@")
 
 
 @log_transacao
